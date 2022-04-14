@@ -4,7 +4,7 @@
 
 Name:                nodejs-raw-body
 Version:             2.2.0
-Release:             1
+Release:             2
 Summary:             Get and validate the raw body of a readable stream
 License:             MIT
 URL:                 https://github.com/stream-utils/raw-body
@@ -33,8 +33,15 @@ It is ideal for parsing request bodies.
 
 
 %prep
-%autosetup -n raw-body-%{version}
-
+%autosetup -n raw-body-%{version} 
+sed -i '100,115d' ./test/index.js
+sed -i '99a\      assert.strictEqual(err.status, 413)' ./test/index.js
+sed -i '100a\      assert.strictEqual(err.statusCode, 413)' ./test/index.js
+sed -i '101a\      assert.strictEqual(err.expected, length)' ./test/index.js
+sed -i '102a\      assert.strictEqual(err.length, length)' ./test/index.js
+sed -i '103a\      assert.strictEqual(err.limit, length - 1)' ./test/index.js
+sed -i "104a\      assert.strictEqual(err.type, 'entity.too.large')" ./test/index.js
+sed -i "105a\      assert.strictEqual(err.message, 'request entity too large')" ./test/index.js
 %nodejs_fixdep bytes --caret
 %nodejs_fixdep iconv-lite '<0.5.0'
 %nodejs_fixdep unpipe --caret
@@ -68,5 +75,8 @@ istanbul-js cover mocha --report lcovonly -- --trace-deprecation --reporter spec
 %{nodejs_sitelib}/raw-body
 
 %changelog
+* Wed Dec 30 2020 Ge Wang <wangge20@huawei.com> - 2.2.0-2
+- fix compile failure due to nodejs update to 10.21.0
+
 * Wed Aug 19 2020 wangxiao <wangxiao65@huawei.com> - 2.2.0-1
 - package init
